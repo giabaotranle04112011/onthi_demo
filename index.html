@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Web Học Bài Thông Minh - Phiên Bản 3.0</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    color: #f0f0f0;
+    min-height: 100vh;
+  }
+  .container {
+    max-width: 960px;
+    margin: auto;
+    padding: 30px 20px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 2.8em;
+    margin-bottom: 10px;
+    text-shadow: 0 2px 15px rgba(0,0,0,0.6);
+  }
+  .subtitle {
+    text-align: center;
+    font-size: 1.4em;
+    opacity: 0.9;
+    margin-bottom: 40px;
+  }
+  .update-note {
+    text-align: center;
+    font-size: 1.2em;
+    color: #ffdd00;
+    background: rgba(0,0,0,0.3);
+    padding: 12px;
+    border-radius: 12px;
+    margin: 20px 0;
+    font-style: italic;
+  }
+  h2 {
+    text-align: center;
+    margin: 30px 0 20px;
+    font-size: 1.9em;
+  }
+  .menu, .mode {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 20px;
+    margin: 30px 0;
+  }
+  button {
+    padding: 22px;
+    border: none;
+    border-radius: 18px;
+    font-size: 19px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.4s ease;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
+  button:hover {
+    transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+  }
+  .menu button {
+    background: linear-gradient(45deg, #00c6ff, #0072ff);
+    color: white;
+  }
+  .mode button {
+    background: linear-gradient(45deg, #ffdd00, #ffb800);
+    color: #333;
+  }
+  .quiz {
+    background: rgba(0,0,0,0.55);
+    backdrop-filter: blur(12px);
+    padding: 35px;
+    border-radius: 25px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.5);
+    margin-top: 30px;
+  }
+  .header-quiz {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 25px;
+  }
+  .timer {
+    font-size: 1.8em;
+    font-weight: bold;
+    background: #333;
+    padding: 12px 25px;
+    border-radius: 12px;
+    color: #fff;
+  }
+  .timer.warning { color: #ff4444; }
+  .progress {
+    width: 100%;
+    height: 12px;
+    background: #333;
+    border-radius: 6px;
+    margin: 25px 0;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #00c6ff, #0072ff);
+    width: 0%;
+    transition: width 0.5s ease;
+  }
+  #question {
+    font-size: 1.75em;
+    margin-bottom: 30px;
+    line-height: 1.5;
+  }
+  .options {
+    display: grid;
+    gap: 18px;
+  }
+  .option {
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+  }
+  .option:hover {
+    background: rgba(255,255,255,0.25);
+    transform: translateX(10px);
+  }
+  .option.correct {
+    background: #28a745 !important;
+    border-color: #218838;
+    color: white;
+  }
+  .option.wrong {
+    background: #dc3545 !important;
+    border-color: #c82333;
+    color: white;
+  }
+  .explanation {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    font-style: italic;
+  }
+  .result {
+    margin-top: 30px;
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+    min-height: 50px;
+  }
+  .score-board {
+    font-size: 1.8em;
+    background: rgba(0,0,0,0.4);
+    padding: 12px 25px;
+    border-radius: 12px;
+  }
+  .hidden { display: none; }
+  @media (max-width: 600px) {
+    h1 { font-size: 2.2em; }
+    .subtitle { font-size: 1.2em; }
+    #question { font-size: 1.5em; }
+    button { font-size: 17px; padding: 18px; }
+    .timer, .score-board { font-size: 1.5em; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>📘 Ôn Thi trắc nghiệm cuối học kỳ 1 2025-2026 </h1>
+  <p class="subtitle">
+    Phiên bản 3.0 – Đầy đủ câu hỏi trắc nghiệm + Thi giả lập 30 phút!
+  </p>
+  <div class="update-note">
+    🚧 Web đang cập nhật phần tự luận (sẽ sớm ra mắt!)
+  </div>
+
+  <h2>Chọn môn học</h2>
+  <div class="menu">
+    <button onclick="selectSubject('ls')">📜 Lịch sử</button>
+    <button onclick="selectSubject('dl')">🌍 Địa lý</button>
+    <button onclick="selectSubject('hoasinh')">🧪 Hóa & Sinh</button>
+    <button onclick="selectSubject('ly')">⚡ Vật lý</button>
+    <button onclick="selectSubject('tin')">💻 Tin học</button>
+    <button onclick="selectSubject('toan')">🔢 Toán học</button>
+  </div>
+
+  <div class="mode hidden" id="mode">
+    <h2>Chọn chế độ chơi</h2>
+    <button onclick="startMode(false)">🧠 Ôn tập tự do (không giới hạn thời gian)</button>
+    <button onclick="startMode(true)">📝 Thi giả lập (30 phút – 30 câu)</button>
+  </div>
+
+  <div class="quiz hidden" id="quiz">
+    <div class="header-quiz">
+      <div class="score-board" id="score-board">Câu: 0/0 | Điểm: 0</div>
+      <div class="timer hidden" id="timer">⏱ 30:00</div>
+    </div>
+    <div class="progress"><div class="progress-bar" id="progress-bar"></div></div>
+    <h2 id="question"></h2>
+    <div class="options" id="options"></div>
+    <div class="result" id="result"></div>
+    <div class="explanation hidden" id="explanation"></div>
+  </div>
+</div>
+
+<script>
+// Dữ liệu câu hỏi – Được bổ sung đầy đủ hơn, thêm giải thích chi tiết
+const data = {
+  ls: [
+    {q: "Nhà nước Liên bang Cộng hòa Xã hội Chủ nghĩa Xô viết (Liên Xô) chính thức được thành lập vào năm nào?", o: ["Năm 1918", "Năm 1922", "Năm 1921", "Năm 1924"], a: 1, exp: "Ngày 30/12/1922, tại Hội nghị các Xô viết toàn Nga."},
+    {q: "Vì sao cuộc khủng hoảng kinh tế thế giới 1929–1933 đã làm thay đổi sâu sắc tình hình chính trị – xã hội ở nhiều nước châu Âu và Mĩ?", o: ["Vì làm các nước nhanh chóng phục hồi kinh tế và ổn định xã hội", "Vì làm cho chủ nghĩa tư bản phát triển cân bằng và bền vững hơn", "Vì làm trầm trọng thêm mâu thuẫn xã hội, tạo điều kiện cho các thế lực cực đoan, phát xít lên cầm quyền ở một số nước", "Vì khiến các nước từ bỏ hoàn toàn con đường phát triển tư bản chủ nghĩa"], a: 2, exp: "Khủng hoảng làm thất nghiệp tăng cao, mâu thuẫn xã hội gay gắt → phát xít lên nắm quyền ở Đức (Hitler 1933), Ý (Mussolini trước đó nhưng củng cố quyền lực)."},
+    {q: "Giả sử em là một thanh niên sống ở châu Á trong thập niên 1930, em sẽ lựa chọn con đường nào để góp phần đấu tranh giành độc lập cho dân tộc?", o: ["Thỏa hiệp và chấp nhận sự thống trị của các nước đế quốc", "Dựa vào sự bảo hộ của các nước đế quốc để phát triển đất nước", "Không quan tâm đến tình hình chính trị – xã hội", "Tham gia các phong trào đấu tranh dân tộc, giành độc lập và tự do"], a: 3, exp: "Con đường cách mạng giải phóng dân tộc là đúng đắn nhất trong bối cảnh thực dân đàn áp mạnh mẽ."},
+    {q: "Chiến tranh thế giới thứ hai bùng nổ vào thời gian nào?", o: ["Ngày 1–9–1939", "Ngày 7–12–1941", "Ngày 22–6–1941", "Ngày 2–9–1945"], a: 0, exp: "Ngày 1/9/1939, Đức tấn công Ba Lan, Anh và Pháp tuyên chiến với Đức."},
+    {q: "Vì sao phong trào dân tộc dân chủ ở Việt Nam giai đoạn 1918–1930 có bước phát triển mới so với trước Chiến tranh thế giới thứ nhất?", o: ["Vì thực dân Pháp tăng cường khai thác thuộc địa lần thứ nhất", "Vì giai cấp công nhân Việt Nam trở thành lực lượng lãnh đạo duy nhất", "Vì ảnh hưởng của Cách mạng tháng Mười Nga và sự truyền bá chủ nghĩa Mác – Lênin vào Việt Nam", "Vì các phong trào yêu nước theo khuynh hướng phong kiến hoàn toàn thắng lợi"], a: 2, exp: "Cách mạng tháng Mười Nga 1917 và sự du nhập chủ nghĩa Mác-Lênin đã mở ra con đường cách mạng vô sản."},
+    {q: "Từ hoạt động của Nguyễn Ái Quốc trong những năm 1919–1930, bài học quan trọng nhất đối với cách mạng Việt Nam là gì?", o: ["Phải dựa hoàn toàn vào sự giúp đỡ của các nước lớn", "Phải có đường lối cách mạng đúng đắn và một chính đảng lãnh đạo thống nhất", "Cần kiên trì con đường đấu tranh vũ trang ngay từ đầu", "Chỉ cần phát động quần chúng nổi dậy là có thể giành độc lập"], a: 1, exp: "Nguyễn Ái Quốc đã tìm thấy con đường cứu nước đúng đắn và thành lập Đảng Cộng sản Việt Nam năm 1930."},
+    {q: "Chiến tranh lạnh bắt đầu sau sự kiện nào dưới đây?", o: ["Chiến tranh thế giới thứ hai kết thúc", "Cách mạng tháng Mười Nga thắng lợi", "Chiến tranh thế giới thứ nhất kết thúc", "Liên Xô tan rã"], a: 0, exp: "Sau WWII (1945), Mỹ và Liên Xô trở thành hai siêu cường đối đầu về ý thức hệ."},
+    {q: "Vì sao sau Chiến tranh thế giới thứ hai, các nước Đông Âu lựa chọn con đường xây dựng chủ nghĩa xã hội?", o: ["Vì chịu sự ép buộc hoàn toàn từ các nước tư bản phương Tây", "Vì các nước này có nền kinh tế phát triển sẵn từ trước chiến tranh", "Vì muốn nhanh chóng trở thành các cường quốc quân sự thế giới", "Vì đây là con đường phù hợp với hoàn cảnh lịch sử và nguyện vọng của nhân dân"], a: 3, exp: "Nhân dân lao động ủng hộ con đường xã hội chủ nghĩa sau khi được giải phóng khỏi phát xít."},
+    // Có thể thêm nhiều câu nữa nếu cần
+  ],
+
+  dl: [
+    {q: "Đặc điểm khí hậu của vùng Trung du và miền núi phía Bắc thuận lợi để phát triển các loại cây có nguồn gốc:", o: ["Cận nhiệt, ôn đới", "Cận nhiệt, hàn đới", "Xích đạo, nhiệt đới", "Ôn đới, xích đạo"], a: 0, exp: "Do độ cao khác nhau nên có cả khí hậu cận nhiệt và ôn đới trên các đỉnh núi cao."},
+    {q: "Loài gia súc nào của vùng Trung du và miền núi phía Bắc chiếm tỉ trọng cao nhất so với cả nước?", o: ["Trâu", "Bò", "Dê", "Ngựa"], a: 0, exp: "Trâu được nuôi nhiều để làm sức kéo ở địa hình đồi núi."},
+    {q: "Tính đa dạng về cơ cấu sản phẩm nông nghiệp của Trung du và miền núi phía Bắc thể hiện ở chỗ có cả:", o: ["Cây công nghiệp, cây ăn quả và cây dược liệu", "Cây lương thực, cây ăn quả và cây thực phẩm", "Cây nhiệt đới, cây cận nhiệt và cây ôn đới", "Cây thực phẩm, cây ăn quả và cây công nghiệp"], a: 2, exp: "Do chênh lệch độ cao lớn, có nhiều tiểu vùng khí hậu khác nhau."},
+    {q: "Trung du và miền núi phía Bắc có thế mạnh phát triển các ngành công nghiệp nào sau đây?", o: ["Lương thực, khai khoáng", "Thực phẩm, hóa chất", "Vật liệu xây dựng, tin học", "Khai khoáng, thủy điện"], a: 3, exp: "Vùng giàu tài nguyên khoáng sản và có tiềm năng thủy điện rất lớn nhờ nhiều sông suối."},
+    {q: "Vùng Trung du và miền núi phía Bắc gồm có bao nhiêu tỉnh?", o: ["15 tỉnh", "14 tỉnh", "13 tỉnh", "11 tỉnh"], a: 1, exp: "Theo quy hoạch hiện hành: 14 tỉnh (từ Hà Giang đến Nghệ An)."},
+    {q: "Loại đất nào chiếm phần lớn diện tích của vùng Trung du và miền núi Bắc Bộ?", o: ["Đất phù sa", "Đất feralit", "Đất ba dan", "Đất mùn"], a: 1, exp: "Đất feralit đỏ vàng trên đồi núi chiếm ưu thế."},
+    {q: "Cây công nghiệp lâu năm quan trọng nhất ở Trung du và miền núi Bắc Bộ là:", o: ["Cao su", "Điều", "Cà phê", "Chè"], a: 3, exp: "Chè là cây chủ lực với các vùng nổi tiếng như Thái Nguyên, Phú Thọ, Yên Bái."}
+  ],
+
+  hoasinh: [
+    {q: "Dụng cụ nào sau đây dùng để phân tán nhiệt khi đốt?", o: ["Lưới tản nhiệt", "Bát sứ", "Bình cầu", "Phễu chiết"], a: 0, exp: "Lưới tản nhiệt (lưới amiăng) giúp phân tán đều ngọn lửa và nhiệt."},
+    {q: "Tính chất vật lý của khí ethylene là:", o: ["Chất khí không màu, không mùi, tan trong nước, nhẹ hơn không khí", "Chất khí không màu, không mùi, ít tan trong nước, nhẹ hơn không khí", "Chất khí màu vàng lục, không mùi, ít tan trong nước, nặng hơn không khí", "Chất khí không màu, mùi hắc, ít tan trong nước, nặng hơn không khí"], a: 1, exp: "Ethylene (C₂H₄) nhẹ hơn không khí (khối lượng mol 28 < 29)."},
+    {q: "CH₃CH₃ có tên gọi là:", o: ["Methane", "Ethane", "Propane", "Butane"], a: 1, exp: "Ethane – C₂H₆."},
+    {q: "Dãy các alkane được sắp xếp theo thứ tự tăng dần phân tử khối là:", o: ["Propane, methane, ethane", "Methane, ethane, propane", "Propane, ethane, methane", "Ethane, propane, butane"], a: 1, exp: "Methane (16) < Ethane (30) < Propane (44)."},
+    {q: "Alkene là các hydrocarbon có đặc điểm:", o: ["Mạch hở, có một liên kết ba C≡C", "Mạch vòng, có một liên kết đôi C=C", "Mạch hở, có một liên kết đôi C=C", "Mạch vòng, chỉ có liên kết đơn"], a: 2, exp: "Công thức chung CnH₂n (n≥2), có một liên kết đôi."},
+    {q: "Khí ethylene cho phản ứng đặc trưng là:", o: ["Phản ứng cháy", "Phản ứng thế", "Phản ứng cộng", "Phản ứng phân hủy"], a: 2, exp: "Do có liên kết đôi nên dễ tham gia phản ứng cộng (cộng H₂, Br₂, HCl...)."},
+    {q: "Trên nhãn chai rượu ghi 18° có nghĩa là:", o: ["Nhiệt độ sôi của ethanol là 18°C", "Nhiệt độ đông đặc của ethanol là 18°C", "Trong 100 ml rượu có 18 ml ethanol nguyên chất", "Trong 100 ml rượu có 18 ml nước"], a: 2, exp: "Độ rượu thể tích: 18% vol ethanol."},
+    {q: "Ethylic alcohol tác dụng được với natri vì:", o: ["Trong phân tử có nguyên tử oxy", "Trong phân tử có nguyên tử hydro và oxy", "Trong phân tử có carbon, hydro và oxy", "Trong phân tử có nhóm –OH"], a: 3, exp: "Nhóm chức -OH (hydroxyl) phản ứng với kim loại kiềm."},
+    {q: "Acetic acid có công thức là:", o: ["HCOOH", "C₂H₅COOH", "CH₂=CHCOOH", "CH₃COOH"], a: 3, exp: "CH₃COOH – axit axetic (giấm)."},
+    {q: "Thực phẩm nào sau đây giàu tinh bột nhất?", o: ["Thịt gà", "Gạo", "Cá hồi", "Rau cải"], a: 1, exp: "Gạo là nguồn cung cấp tinh bột chính."},
+    {q: "Chất dùng làm nguyên liệu điều chế trực tiếp ethanol công nghiệp là:", o: ["Ethane", "Ethylene", "Methane", "Glucose"], a: 3, exp: "Lên men glucose từ tinh bột hoặc đường."},
+    {q: "DNA được cấu tạo từ các nucleotide gồm các base nào?", o: ["T, A, G, U", "A, T, C, G", "A, U, G, C", "T, U, G, C"], a: 1, exp: "Adenin (A), Thymin (T), Guanin (G), Cytosin (C)."},
+    {q: "Mã di truyền là:", o: ["Trình tự nucleotide trong mRNA quy định trình tự amino acid", "Trình tự đường trong DNA", "Trình tự lipid màng", "Một loại enzyme"], a: 0, exp: "Bộ ba nucleotide trên mRNA mã hóa một amino acid."},
+    {q: "Đột biến gene là biến đổi trong:", o: ["Cấu trúc của gene", "Số lượng gene", "Hình dạng gene", "Vị trí của gene"], a: 0},
+    {q: "Ethylene có lẫn tạp chất là SO2,CO2 và hơi nước . có thể loại bỏ tạp chất bằng cách:", o: ["A. Dẫn hỗn hợp qua dung dịch brom dư", "B. Dẫn hỗn hợp qua dung dịch NaCl dư", "C. Dẫn hỗn hợp lần lượt qua bình đựng dung dịch NaOH dư và bình đựng dung dịch H2SO4 đặc.", "D. Dẫn hỗn hợp lần lượt qua bình đựng dung dịch brom dư và bình đựng dung dịch H2SO4 đặc."], a: 2},
+    {q:  "Cho một mẫu sodium vào ống nghiệm đựng ethylic alcohol. Hiện tượng quan sát được là", o: ["có bọt khí màu nâu thoát ra", "mẫu sodium tan dần không có bọt khí thoát ra.", "mẫu sodium nằm dưới bề mặt chất lỏng và không tan.", " có bọt khí không màu thoát ra và sodium tan dần."], a: 3},
+    {q: "tính chất vật lý của acetic acid là", o: ["chất lỏng, không màu, vị chua, tan vô hạn trong nước.", "chất lỏng, màu trắng, vị chua, tan ít trong nước.", "chất lỏng, không màu, vị đắng, tan vô hạn trong nước", " chất lỏng, không màu, vị chua, không tan trong nước."], a: 0},
+    {q: "Để phân biệt dung dịch CH3COOH và C2H5OH ta dùng", o: ["Na", "Zn", "K", "Cu",], a: 1},
+    {q: "Tính chất vật lí của cellulose là", o: ["Chất rắn, màu trắng, tan trong nước.", " Chất rắn, màu trắng, tan trong nước nóng.", "Chất rắn, không màu, tan trong nước.", "Chất rắn, không màu, không tan trong nước."], a: 1},
+    {q: "Saccharose có tính chất vật lí là?", o: ["chất rắn kết tinh, không màu, vị ngọt, khó tan trong nước.", "chất rắn kết tinh, không màu, vị ngọt, dễ tan trong nước. ", " chất rắn kết tinh, màu vàng nhạt, vị ngọt, dễ tan trong nước.", "chất rắn kết tinh, không màu, vị ngọt, không tan trong nước lạnh."], a: 0},
+    {q: "Saccharose có những ứng dụng trong thực tế là", o: ["Nguyên liệu trong công nghiệp thực phẩm, thức ăn cho người, pha chế thuốc", ".Nguyên liệu sản xuất thuốc nhuộm, sản xuất giấy, là thức ăn cho người", "Làm thức ăn cho người, tráng gương, tráng ruột phích", ".Làm thức ăn cho người, sản xuất gỗ, giấy, thuốc nhuộm"], a: 0},
+    {q: " Nếu trên một mạch đơn của phân tử DNA có trật tự là: – T – T – G – C – A –Trật tự của đoạn mạch bổ sung tại vị trí đó là", o: ["– T – A – C – G – T –.", "– A – A – C – G – T –.", " – A - T – G – C – A –.", "– A – C – G – T – A –."], a: 1},  // Thêm nhiều câu Hóa và Sinh khác nếu muốn
+  ],
+
+  ly: [
+    {q: "Đơn vị đo của thế năng trọng trường là gì?", o: ["Niutơn (N)", "Jun (J)", "Kilôgam (kg)", "Mét trên giây bình phương (m/s²)"], a: 1, exp: "Thế năng là dạng năng lượng nên đơn vị là Jun (J)."},
+    {q: "Cơ năng của một vật bao gồm:", o: ["Thế năng và động năng", "Động năng và công cơ học", "Thế năng và công suất", "Động năng và lực"], a: 0, exp: "Cơ năng = Động năng + Thế năng (bảo toàn trong nhiều trường hợp)."},
+    {q: "Công suất là đại lượng đo:", o: ["Công thực hiện trong một đơn vị thời gian", "Công thực hiện trong một ngày", "Công thực hiện trong một giờ", "Tốc độ thực hiện công"], a: 0, exp: "P = A/t (Jun/giây = W)."},
+    {q: "Công của một lực không đổi F làm vật dịch chuyển quãng đường s theo hướng lực là:", o: ["A = F / s", "A = F · s", "A = F + s", "A = F − s"], a: 1, exp: "Công = lực × quãng đường × cosα (α=0° → cos0=1)."},
+    {q: "Khúc xạ ánh sáng là hiện tượng:", o: ["Tia sáng bị bật ngược lại khi gặp gương", "Tia sáng bị gãy khúc khi đi từ môi trường này sang môi trường khác", "Tia sáng trắng bị tách thành nhiều màu", "Tia sáng đổi màu khi qua kính màu"], a: 1, exp: "Hiện tượng thay đổi hướng truyền khi qua mặt phân cách hai môi trường."},
+    {q: "Chiết suất tuyệt đối của một môi trường là chiết suất tỉ đối so với:", o: ["Không khí", "Chân không", "Nước", "Thủy tinh"], a: 1, exp: "n = c/v, c là tốc độ ánh sáng trong chân không."},
+    {q: "Khi chiếu ánh sáng trắng qua lăng kính thu được:", o: ["Ánh sáng trắng", "Dải màu đỏ – cam – vàng – lục – lam – chàm – tím", "Ba màu cơ bản đỏ – lục – lam", "Ánh sáng đỏ"], a: 1, exp: "Hiện tượng tán sắc ánh sáng."}
+  ],
+
+  tin: [
+    {q: "Phương án nào sau đây KHÔNG phải là ứng dụng của máy tính trong giải trí?", o: ["Nghe nhạc", "Xem phim", "Nấu ăn tự động", "Chơi game"], a: 2, exp: "Nấu ăn thường không phải chức năng chính của máy tính thông thường."},
+    {q: "Nguồn thông tin đáng tin cậy nhất là:", o: ["Bài đăng trên mạng xã hội", "Tin đồn trên Internet", "Sách giáo khoa do Bộ Giáo dục phê duyệt", "Blog cá nhân"], a: 2, exp: "Sách giáo khoa được kiểm duyệt kỹ lưỡng."},
+    {q: "Hành vi nào vi phạm nghiêm trọng an toàn thông tin mạng?", o: ["Chia sẻ ảnh cá nhân", "Phát tán virus máy tính", "Tải phần mềm miễn phí", "Đăng bài viết ý kiến"], a: 1, exp: "Phát tán virus là hành vi tấn công mạng."},
+    {q: "Sử dụng phần mềm crack (không bản quyền) vi phạm:", o: ["Luật an ninh mạng", "Luật sở hữu trí tuệ", "Luật giao thông", "Luật lao động"], a: 1, exp: "Vi phạm bản quyền phần mềm."}
+  ],
+
+  toan: [
+    {q: "Giá trị của biểu thức (2 + 3) × 5 là?", o: ["25", "13", "15", "10"], a: 0, exp: "Thực hiện trong ngoặc trước: 5 × 5 = 25."},
+    {q: "Diện tích hình vuông cạnh a là?", o: ["a", "2a", "a²", "4a"], a: 2, exp: "S = a × a = a²."},
+    {q: "sin 90° bằng bao nhiêu?", o: ["0", "1", "-1", "0.5"], a: 1, exp: "sin 90° = 1 (giá trị lớn nhất)."},
+    {q: "Căn bậc hai của 144 là?", o: ["10", "12", "14", "16"], a: 1, exp: "12² = 144."},
+    {q: "Giá trị xấp xỉ của π là?", o: ["2.718", "3.14", "1.618", "2.14"], a: 1, exp: "π ≈ 3.14159..."}
+  ]
+};
+
+let subject = "";
+let questions = [];
+let index = 0;
+let score = 0;
+let wrongQuestions = [];
+let examMode = false;
+let timeLeft = 1800; // 30 phút
+let timerInterval = null;
+
+function selectSubject(s) {
+  subject = s;
+  document.getElementById("mode").classList.remove("hidden");
+  document.querySelector(".menu").classList.add("hidden");
+}
+
+function startMode(isExam) {
+  examMode = isExam;
+  index = 0;
+  score = 0;
+  wrongQuestions = [];
+
+  // Lấy toàn bộ câu hỏi của môn, xáo trộn, chọn tối đa 30 câu cho chế độ thi
+  let allQuestions = [...data[subject]];
+  allQuestions = allQuestions.sort(() => Math.random() - 0.5);
+  questions = examMode ? allQuestions.slice(0, Math.min(30, allQuestions.length)) : allQuestions;
+
+  document.getElementById("mode").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+
+  if (examMode) {
+    timeLeft = 1800;
+    document.getElementById("timer").classList.remove("hidden");
+    document.getElementById("timer").classList.remove("warning");
+    startTimer();
+  } else {
+    document.getElementById("timer").classList.add("hidden");
+    if (timerInterval) clearInterval(timerInterval);
+  }
+
+  showQuestion();
+}
+
+function startTimer() {
+  updateTimerDisplay();
+  timerInterval = setInterval(() => {
+    timeLeft--;
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      timeLeft = 0;
+      finishExam();
+      return;
+    }
+    updateTimerDisplay();
+    if (timeLeft <= 300) {
+      document.getElementById("timer").classList.add("warning");
+    }
+  }, 1000);
+}
+
+function updateTimerDisplay() {
+  const m = Math.floor(timeLeft / 60);
+  const s = timeLeft % 60;
+  document.getElementById("timer").innerText = `⏱ ${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+}
+
+function showQuestion() {
+  document.getElementById("result").innerHTML = "";
+  document.getElementById("explanation").classList.add("hidden");
+
+  const q = questions[index];
+  document.getElementById("question").innerText = `${index + 1}. ${q.q}`;
+
+  // Xáo trộn đáp án
+  const shuffled = q.o.map((opt, i) => ({opt, i}))
+                     .sort(() => Math.random() - 0.5);
+
+  let optHTML = "";
+  shuffled.forEach(item => {
+    optHTML += `<div class="option" onclick="choose(${item.i === q.a})">${item.opt}</div>`;
+  });
+  document.getElementById("options").innerHTML = optHTML;
+
+  document.getElementById("score-board").innerText = `Câu: ${index + 1}/${questions.length} | Điểm: ${score}`;
+  document.getElementById("progress-bar").style.width = `${((index + 1) / questions.length) * 100}%`;
+}
+
+function choose(isCorrect) {
+  const options = document.querySelectorAll(".option");
+  options.forEach(opt => opt.style.pointerEvents = "none");
+
+  // Đánh dấu đáp án đúng
+  const correctIdx = questions[index].a;
+  options.forEach(opt => {
+    if (opt.innerText === questions[index].o[correctIdx]) {
+      opt.classList.add("correct");
+    }
+  });
+
+  if (isCorrect) {
+    score++;
+    document.getElementById("result").innerHTML = "✅ <strong>Chính xác!</strong>";
+  } else {
+    document.getElementById("result").innerHTML = "❌ <strong>Sai rồi!</strong>";
+    wrongQuestions.push(questions[index]);
+    // Đánh dấu đáp án người chọn là sai
+    options.forEach(opt => {
+      if (opt.onclick.toString().includes("true") === false && opt.style.pointerEvents === "none") {
+        // Tìm đáp án được click (cách đơn giản)
+      }
+    });
+  }
+
+  if (questions[index].exp) {
+    document.getElementById("explanation").innerHTML = `<strong>Giải thích:</strong> ${questions[index].exp}`;
+    document.getElementById("explanation").classList.remove("hidden");
+  }
+
+  document.getElementById("score-board").innerText = `Câu: ${index + 1}/${questions.length} | Điểm: ${score}`;
+
+  index++;
+  if (index < questions.length) {
+    setTimeout(showQuestion, 2800);
+  } else {
+    setTimeout(finishExam, 2800);
+  }
+}
+
+function finishExam() {
+  if (timerInterval) clearInterval(timerInterval);
+
+  const percent = questions.length > 0 ? Math.round((score / questions.length) * 100) : 0;
+  let rank = "", emoji = "";
+  if (percent >= 90) { rank = "Xuất sắc"; emoji = "🏆"; }
+  else if (percent >= 80) { rank = "Giỏi"; emoji = "🌟"; }
+  else if (percent >= 65) { rank = "Khá"; emoji = "👍"; }
+  else if (percent >= 50) { rank = "Trung bình"; emoji = "🆗"; }
+  else { rank = "Cần cố gắng hơn"; emoji = "💪"; }
+
+  const timeUsed = examMode ? (1800 - timeLeft) : null;
+  const timeText = examMode ? `<p>Thời gian làm bài: ${Math.floor(timeUsed / 60)} phút ${timeUsed % 60} giây</p>` : "";
+
+  let wrongReview = wrongQuestions.length > 0 ?
+    `<button onclick="reviewWrong()" style="margin:10px;padding:14px 28px;font-size:18px;background:#ff4444;border:none;border-radius:12px;color:white;cursor:pointer;">
+      🔍 Xem lại ${wrongQuestions.length} câu sai
+    </button>` : "";
+
+  document.getElementById("question").innerText = "Chúc mừng bạn đã hoàn thành!";
+  document.getElementById("options").innerHTML = "";
+  document.getElementById("result").innerHTML = `
+    <h2 style="text-align:center">${emoji} Kết quả</h2>
+    <p style="font-size:2em;text-align:center">
+      Điểm: <strong>${score}/${questions.length}</strong> (${percent}%)<br>
+      Xếp loại: <strong>${rank}</strong>
+    </p>
+    ${timeText}
+    <div style="text-align:center;margin-top:30px;">
+      <button onclick="restartSubject()" style="padding:15px 30px;font-size:18px;background:#00c6ff;border:none;border-radius:10px;color:white;cursor:pointer;margin:10px;">
+        🔄 Làm lại môn này
+      </button>
+      <button onclick="location.reload()" style="padding:15px 30px;font-size:18px;background:#0072ff;border:none;border-radius:10px;color:white;cursor:pointer;margin:10px;">
+        🏠 Về menu chính
+      </button>
+      ${wrongReview}
+    </div>
+  `;
+  document.getElementById("progress-bar").style.width = "100%";
+}
+
+function reviewWrong() {
+  questions = wrongQuestions;
+  index = 0;
+  score = 0;
+  wrongQuestions = [];
+  examMode = false;
+  document.getElementById("timer").classList.add("hidden");
+  if (timerInterval) clearInterval(timerInterval);
+  showQuestion();
+}
+
+function restartSubject() {
+  startMode(examMode);
+}
+</script>
+</body>
+</html>
